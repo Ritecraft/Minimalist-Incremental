@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { EventProvider, GameStateModel } from './models/gamestate.model';
+import { EventsProvider, GameStateModel } from './models/gamestate.model';
 import { GameStateService } from './services/gamestate.service';
 @Component({
   selector: 'app-root',
@@ -25,7 +25,7 @@ uptick() {
 
 
 ngOnInit() {
-  EventProvider.Init();
+  EventsProvider.Init();
   setInterval(()=> {
     this.uptick(); },10); 
   }
