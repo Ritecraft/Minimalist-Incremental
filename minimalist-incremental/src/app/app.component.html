@@ -1,0 +1,127 @@
+<ng-container *ngIf="gameState$ | async ; let gameState">
+    <div style="width: 50%; float: left;">
+
+<table *ngIf="gameState.income > 0 || gameState.money > 0">
+<thead>
+    <tr>
+        <th>
+            $$$
+        </th>
+        <th>
+           Time Machine Power
+        </th>
+        <th>
+            Gold Mining Infrastructure
+        </th>
+        <th>
+            Quarry Depth
+        </th>
+    </tr>
+
+</thead>
+<tbody>
+    <tr>
+        <td>
+            {{gameState.money | number : '1.2-2'}} 
+        </td>
+        <td>
+            {{gameState.timeTravel.intervalLevel}} 
+        </td>
+        <td>
+            {{gameState.mineLevel}} 
+        </td>
+        <td>
+            {{gameState.quarryLevel}} 
+        </td>
+    </tr>
+    <tr>
+        <td>
+           {{gameState.income | number : '1.2-2'}} $/s
+        </td>
+        <td>
+            <button (click)="buyTimeMachine()" [disabled]="!gameState.timeTravel.canBuyTimeMachine">{{gameState.timeTravel.intervalLevel > 0?'Add Power Node':'Build Time Machine'}}</button>
+        </td>
+        <td>
+            <button (click)="buyMine()" [disabled]="!gameState.canBuyMine">Buy Mine</button>
+        </td>
+        <td>
+            <button (click)="buyQuarry()" [disabled]="!gameState.canBuyQuarry">Buy Quarry</button>
+        </td>
+    </tr>
+</tbody>
+</table>
+<table *ngIf="gameState.timeTravel.intervalLevel > 0">
+    <thead>
+        <tr>
+            <th>
+                Entropy / Sigils
+            </th>
+            <th>
+               Time Crystal Layers
+            </th>
+            <th>
+                Butterfly Resonator Strength
+            </th>
+            <th>
+                Paradox Engine Throttle
+            </th>
+        </tr>
+    
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                {{gameState.timeTravel.entropy }} / {{gameState.timeTravel.getFreeLevels()}} 
+            </td>
+            <td>
+                {{gameState.timeTravel.timeCrystalLevel}} 
+            </td>
+            <td>
+                {{gameState.timeTravel.butterflyResonatorLevel}} 
+            </td>
+            <td>
+                {{gameState.timeTravel.paradoxEngineLevel}} 
+            </td>
+        </tr>
+        <tr>
+            <td>
+              Next increase = {{(gameState.timeTravel.intervalLevel + 1 )%3 + 1}}
+            </td>
+            <td>
+                <button (click)="buyCrystal()" [disabled]="!gameState.timeTravel.canBuyCrystal">Construct Crystal Layer</button>
+            </td>
+            <td>
+                <button (click)="buyButterfly()" [disabled]="!gameState.timeTravel.canBuyButterfly">Summon a butterfly</button>
+            </td>
+            <td>
+                <button (click)="buyParadox()" [disabled]="!gameState.timeTravel.canBuyParadox">{{paradoxNames[gameState.timeTravel.paradoxEngineLevel]}}</button>
+            </td>
+        </tr>
+    </tbody>
+    </table>
+</div>
+<div style="width: 50%; float: right;" >
+    <table>
+        <thead>
+            <tr>
+            <th>
+                <button (click)="getAdventure()" [disabled]="gameState.adventure.coolDown > 0">
+                    Look for an adventure!
+                </button>
+                Day {{gameState.adventure.days}}
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let msg of messages">
+                <td>
+                    {{msg}}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    
+</div>
+</ng-container>
+<router-outlet></router-outlet>
