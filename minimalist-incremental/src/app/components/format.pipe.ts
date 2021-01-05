@@ -1,13 +1,4 @@
 import { Pipe, PipeTransform } from '@angular/core';
-/*
- * Raise the value exponentially
- * Takes an exponent argument that defaults to 1.
- * Usage:
- *   value | exponentialStrength:exponent
- * Example:
- *   {{ 2 | exponentialStrength:10 }}
- *   formats to: 1024
-*/
 
 export class StringFormatter {
     public static Format(value: string, ...args: any[]) : string
