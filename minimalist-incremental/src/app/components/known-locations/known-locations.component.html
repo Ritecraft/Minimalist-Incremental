@@ -1,0 +1,26 @@
+<mat-tab-group>
+    <mat-tab [label]="('locations.garage' | translate)">
+  
+        <ng-template matTabContent>
+            <div style="padding-top: 8px">
+            <ng-container  *ngIf="gameState.skills.inventing > 0">
+            <garage [gameState]="gameState">
+
+            </garage>
+        </ng-container>
+        <ng-container *ngIf="!gameState.skills.inventing">
+            {{'locations.emptyGarage' | translate}}
+        </ng-container>
+    </div>    
+    </ng-template>
+
+    </mat-tab>
+    <mat-tab [label]="('locations.timeTravelLab' | translate)" *ngIf="gameState.timeTravel.intervalLevel > 1">
+        <time-travel-lab [gameState]="gameState">
+            
+        </time-travel-lab>
+    </mat-tab>
+    <mat-tab [label]="('locations.guild' | translate)" *ngIf="gameState.adventure.guild.canAccess">
+        
+    </mat-tab>
+    </mat-tab-group>

@@ -1,0 +1,59 @@
+<ng-container *ngIf="gameState$ | async ; let gameState">
+    <h2>
+        {{GetTitle(gameState)}}
+    </h2>
+    <div style="width: 15%; float: left;">
+        <mat-card>
+        <div *ngFor="let status of GetStatuses(gameState)" style="padding-bottom: 16px;">
+           <h3 >
+                {{status.name | translate}}
+           </h3>
+           <div *ngFor="let value of status.values">
+                {{value.name | translate}} : {{value.value}} {{value.info?('(' + value.info + ')'):''}}
+           </div>
+        </div>
+    </mat-card>
+
+
+    </div>
+ <div style="width: 60%; float: left;">
+    <mat-card>
+<known-locations [gameState]="gameState">
+
+</known-locations>
+</mat-card>
+</div>
+<div style="width: 25%; float: left;" >
+    <mat-card>
+    <table width="100%">
+        <thead>
+            <tr>
+            <th>
+               
+                {{"adventuring.Day" | translate}} {{gameState.adventure.days}}
+               
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr>
+                {{"adventuring.Feeling" | translate}}: {{(gameState.adventure.eventCooldownReducer > 0? 'adventuring.feelings.Energized':'adventuring.feelings.Normal')  | translate}}
+            </tr>
+            <tr>
+                <button mat-raised-button color="primary" (click)="getAdventure()" [disabled]="gameState.adventure.coolDown > 0">
+                    {{"buttons.adventure" | translate }} {{gameState.adventure.coolDown > 0?(("adventuring.inDays" | translate) | stringFormat: [gameState.adventure.coolDown]):''}}
+                </button>
+                <button mat-stroked-button (click)="viewStory(gameState)">{{"buttons.story" | translate }}</button>
+            </tr>
+
+            <tr *ngFor="let msg of (messages$ | async)">
+                <td>
+                    {{msg.text | translate | stringFormat: msg.args}}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</mat-card>
+    
+</div>
+</ng-container>

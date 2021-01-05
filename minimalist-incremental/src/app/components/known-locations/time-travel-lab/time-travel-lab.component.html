@@ -1,0 +1,44 @@
+
+
+        
+    <table *ngIf="gameState.timeTravel.intervalLevel > 1">
+        <thead>
+            <tr>           
+                <th>
+                   {{'timeTravel.crystals' | translate}}
+                </th>
+                <th>
+                    {{'timeTravel.butterfly' | translate}}
+                </th>
+                <th>
+                    {{'timeTravel.paradox' | translate}}
+                </th>
+            </tr>
+        
+        </thead>
+        <tbody>
+            <tr>           
+                <td>
+                    {{gameState.timeTravel.timeCrystalLevel}} 
+                </td>
+                <td>
+                    {{gameState.timeTravel.butterflyResonatorLevel}} 
+                </td>
+                <td>
+                    {{gameState.timeTravel.paradoxEngineLevel}} 
+                </td>
+            </tr>
+            <tr>
+              
+                <td>
+                    <button mat-raised-button color="primary" (click)="buyCrystal()" [disabled]="!gameState.timeTravel.canBuyCrystal">{{"buttons.timeTravel.timeCrystal" | translate}}</button>
+                </td>
+                <td>
+                    <button mat-raised-button color="primary" (click)="buyButterfly()" [disabled]="!gameState.timeTravel.canBuyButterfly">{{"buttons.timeTravel.butterfly" | translate}}</button>
+                </td>
+                <td>
+                    <button mat-raised-button color="primary" (click)="buyParadox()" [disabled]="!gameState.timeTravel.canBuyParadox">{{paradoxNames[gameState.timeTravel.paradoxEngineLevel] | translate}}</button>
+                </td>
+            </tr>
+        </tbody>
+        </table>

@@ -1,11 +1,16 @@
+import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
+import { StringFormatter } from "../components/format.pipe";
 import { GameStateModel } from "../models/gamestate.model";
+import { MessagesService } from "./messages.service";
 
+@Injectable()
 export class GameStateService {
     gameState_subject: BehaviorSubject<GameStateModel>;
     gameState$: Observable<GameStateModel>;
+    
     lastPassedTime: number;
-    constructor() {
+    constructor(private messagesService : MessagesService) {
         this.gameState_subject = new BehaviorSubject(new GameStateModel()),
         this.gameState$ = this.gameState_subject.asObservable(),
         this.lastPassedTime = (new Date).getTime()
@@ -37,12 +42,22 @@ export class GameStateService {
     }
     BuyTimeMachine() {
         let t = this.gameState_subject.value.copy();
-        t.BuyTimeMachine(),
-        this.next(t)
+        t.BuyTimeMachine();
+        if(t.timeTravel.intervalLevel == 1)
+        {
+            this.messagesService.publish('story.inventor.first',t.timeTravel.foundedDay);
+            this.messagesService.publish("story.inventor.firstSigil");
+        }
+        if(t.timeTravel.intervalLevel == 2)
+        {
+            this.messagesService.publish('story.inventor.timeTravelLab');
+        }
+        this.next(t);
     }
     BuyCrystal() {
         let t = this.gameState_subject.value.copy();
         t.timeTravel.BuyTimeCrystal(),
+
         this.next(t)
     }
     BuyParadox() {
@@ -58,7 +73,26 @@ export class GameStateService {
     getEvent() {
         let t = this.gameState_subject.value.copy(),
         e = t.adventure.getRandomEvent(t);
+        this.messagesService.publish(e);
         return this.next(t),
         e
+    }
+
+    GetStoryMessages(g : GameStateModel, t: any) {
+        let result : {texts: string[], category:string}[] = [];
+        result.push({texts: [], category: t.instant('story.inventor.path')});
+        result.push({texts: [], category: t.instant('story.social.path')});
+        if(g.skills.inventing > 0) result[0].texts.push(t.instant('story.inventor.head'));
+        if(g.timeTravel.intervalLevel > 0) result[0].texts.push(StringFormatter.TranslateAndFormat(t, 'story.inventor.first', g.timeTravel.foundedDay));
+        if(g.timeTravel.intervalLevel > 0) result[0].texts.push(t.instant("story.inventor.firstSigil"));
+        if(g.timeTravel.intervalLevel > 1) result[0].texts.push(t.instant("story.inventor.timeTravelLab"));
+        if(g.skills.dreaming > 0) result[0].texts.push(t.instant("story.inventor.dreams"));
+ 
+
+        if(g.eventCashLevel > 0) result[1].texts.push(t.instant("story.social.surveys"))
+        if(g.eventCashLevel > 1) result[1].texts.push(t.instant("story.social.bot"))
+        if(g.eventCashLevel > 2) result[1].texts.push(t.instant("story.social.cultStart"))
+   
+        return result.filter(q => q.texts.length > 0);
     }
 }
