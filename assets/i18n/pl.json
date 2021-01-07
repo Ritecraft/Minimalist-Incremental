@@ -162,7 +162,7 @@
             "guild": "You found an Adventurer's Guild on the next street over. They have some cool stuff on sale."
         },
         "events": {
-            "sodaLuck": "You got lucky and got a lucky prize-code under a sodda bottlecap",
+            "sodaLuck": "You got lucky and got a lucky prize-code under a soda bottlecap",
             "cat": "You found a cat stuck on a tree. You managed to help it",
             "nothing": "Nothing cool happens.",
             "coin": "You found a coin on the streets. Lucky you! (+1 $)",
