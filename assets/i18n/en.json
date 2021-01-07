@@ -1,0 +1,185 @@
+{
+    "main":
+    {
+        "language": "Language",
+    
+        "languages":
+        {
+            "en": "English",
+            "pl": "Polish"
+
+        }
+    },
+    "upgrade": {
+        "level": "Level",
+        "cost": "Cost",
+        "requirements": "Requirements"
+    },
+    "resources":
+    {
+        "Money": "Money",
+        "Entropy":"Entropy",
+        "Sigils":"Sigils",
+        "Bottlecaps": "Bottlecaps"
+
+    },
+    "categories":
+    {
+        "Resources": "Resources",
+        "Skills":"Skills"
+    },
+    "skills":
+    {
+        "Drawing":"Drawing",
+        "Inventing":"Inventing",
+        "GettingBored":"Getting Bored",
+        "Adventuring":"Adventuring",
+        "Dreaming":"Dreaming",
+        "Athletics":"Athletics",
+        "AnimalHandling":"Animal Handling",
+        "Geology": "Geology",
+        "Medicine": "Medicine",
+        "Suits": "Tech Suits Piloting",
+        "Diplomacy": "Diplomacy",
+        "Music": "Music",
+        "Finance": "Finance",
+        "History": "History",
+        "Engineering": "Engineering",
+        "Biology": "Biology",
+        "Combat": "Combat",
+
+
+
+        "Categories": {
+            "Esoteric": "Esoteric",
+            "NaturalSciences": "Natural Sciences",
+            "Technical": "Technical",
+            "Heroic": "Heroic",
+            "Artistic": "Artistic",
+            "SocialSciences": "Social Sciences"
+        }
+    },
+    "titles":
+    {
+            "house": "Your House",
+            "timeTravel": "Time Travel Inc. Founded Day {0}"
+    },
+    "infos":
+    {
+        "entropy": "Next gain: {0}",
+        "adventuring": "- {0} cooldown days"
+    },
+    "buttons":
+    {
+        "story": "Story so far",
+        "adventure": "Look for an adventure!",
+        "mine": "Build a mine",
+        "quarry": "Dig a quarry",
+        "apply": "Apply",
+       
+        "timeTravel": {
+        
+        
+        "timeMachine": "Build a time machine",
+        "powerNode": "Add a power node",
+        "timeCrystal": "Construct Crystal Layer",
+        "butterfly": "Summon a butterfly",
+        "paradoxes": {
+            "washington": "Meet george washington",
+            "ancestor": "Kill an ancestor",
+            "beethoven": "Teach Beethoven 9th symphony",
+            "pastTravel":"Invent time travel in the past",
+            "noPlague":"Prevent the plague",
+            "yesPlague":"Recause the plague",
+            "saveDodos": "Stop Dodo extinction",
+            "killMoskitos": "Cause moskito extinction",
+            "greekGenes": "Teach ancient greeks gene-splicing",
+            "stopSwans": "Stop swan-people invasion",
+            "moonLanding": "Replace Armstrong on the moon",
+            "apple": "Buy Apple stocks",
+            "mafia": "Defeat the Big Fruit Mafia",
+            "backToTheFuture": "Get your dad to take mom to prom",
+            "futureTravel": "Invent time travel in the future",
+            "honestAbe": "Befriend Honest Abe",
+            "stop": "Stop yourself from inventing time travel"
+
+
+
+
+        }
+    }
+    },
+    "mining": {
+        "mineLevel": "Gold Mining Infrastracture"
+    },
+    "quarry": {
+        "quarryLevel": "Quarry Depth"
+    },
+    "timeTravel": {
+        "crystals": "Time Crystal Layers",
+        "butterfly": "Butterfly Resonator Strength",
+        "paradox": "Paradox Engine Throttle",
+        "intervalLevel": "Time Machine Power"
+    },
+
+    "locations": {
+        "garage": "Garage",
+        "guild": "Adventurers Guild",
+        "timeTravelLab":"Time Travel Lab",
+        "emptyGarage": "An old, boring empty garage"
+    },
+    
+    "adventuring":
+    {
+        "Day": "Day",
+        "Feeling": "Feeling",
+        "inDays": "In {0} days",
+        "feelings": {
+            "Normal": "Normal",
+            "Energized": "Energized"
+        }
+
+        
+    },
+    "story":
+    {
+    
+        
+        "inventor": {
+            "path": "Inventor Path",
+            "head": "You hit your head while standing up from the toilet and figured out how to build a time machine from common household objects.",
+            "first": "You built your first time machine on Day {0} of the new era - Era of Time Travel",
+            "firstSigil": "A weird squiggly symbol apperead on the floor where the time machine stands. You are pretty sure it's called a Sigil, but you don't know how you know it.",
+            "timeTravelLab": "After powering up, your time machine caught a stream of entropy and transported you to a strange location. There are really weird devices in there.",
+            "dreams": "You started dreaming about your Sigils. It's nothing to worry about."
+
+        },
+        "social": {
+            "path": "Social Path",
+            "surveys": "You're getting a modest income filling out surveys online",
+            "bot": "You got a discord bot completing the surveys for you",
+            "cultStart": "You accidentally started an online cult. Nothing bad will come out of it, you're sure."
+        },
+        "adventurer": {
+            "nothing": "Nothing of note happenned to you yet. Maybe try some adventuring.",
+            "guild": "You found an Adventurer's Guild on the next street over. They have some cool stuff on sale."
+        },
+        "events": {
+            "sodaLuck": "You got lucky and got a lucky prize-code under a sodda bottlecap (You got a bike)",
+            "cat": "You found a cat stuck on a tree. You managed to help it",
+            "nothing": "Nothing cool happens.",
+            "coin": "You found a coin on the streets. Lucky you! (+1 $)",
+            "surveys": "You found an useful comment on the internet - free cash working from home? Sign me in! (+1 passive income)",
+            "soda": "You found a free soda pop. Refreshing.",
+            "discord": "You paid 20$ for an auto-survey discord bot. It's basically free money! (+1 passive income).",
+            "unknownDreams": "You dreamt about your Sigils - they sang a song to you in an incomprensible language. It sounded nice.",
+            "travelDreams": "You dreamt about your Sigils - they sang you a song about your travel.",
+            "shift": "You were so bored you picked up an actual shift in a real job. Pay is not good though. (+10 $)",
+            "cultStart": "While trolling on discord you accidentally started a cult worshipping your bot. (+ 1 passive income)",
+            "doodleSigil": "While doodling out of boredom your pencil disapperead. That's normal, right? (+ 1 sigil)",
+            "paintSigil": "For your time machine's first birthday you got it a new paint job from the nice fellow with the 'The End is Nigh' sign. (+ 1 sigil)"
+        }
+    }
+
+
+}
