@@ -1,0 +1,26 @@
+<div style="padding: 6x;">
+    <mat-card class="bordered">
+        <mat-card-header>
+            <h1>{{this.upgrade.name | translate}}</h1>
+            
+        </mat-card-header>
+        <h2>{{'upgrade.level' | translate}}: {{this.upgrade.currentLevel}} -> {{this.upgrade.currentLevel + 1}}</h2>
+        <div>
+        <h2>{{'upgrade.cost' | translate}}</h2>
+        <div *ngFor="let cost of upgrade.costs">
+            <span [ngClass]="cost.haveEnough?'green':'red'">{{cost.name | translate}} : {{cost.cost | number : '1.2-2'}}</span>
+        </div>
+    </div>
+   
+    <div *ngIf="upgrade.requirements.length > 0">
+        <h2>{{'upgrade.requirements' | translate}}</h2>
+        <div *ngFor="let rq of upgrade.requirements">
+            <span [ngClass]="rq.haveEnough?'green':'red'">{{rq.name | translate}} : {{rq.value}}</span>
+        </div>
+    </div>
+
+        <button mat-raised-button color="primary" (click)="applyUpgrade()" [disabled]="!upgrade.haveEnough">
+            {{upgrade.description | translate}}
+        </button>
+    </mat-card>
+</div>

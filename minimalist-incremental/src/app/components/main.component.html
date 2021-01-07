@@ -4,14 +4,38 @@
     </h2>
     <div style="width: 15%; float: left;">
         <mat-card>
-        <div *ngFor="let status of GetStatuses(gameState)" style="padding-bottom: 16px;">
-           <h3 >
-                {{status.name | translate}}
+        <div style="padding-bottom: 16px;" *ngIf="GetResources(gameState) ; let resources"> 
+           <h3 style="font-weight: bold;" >
+                {{'categories.Resources' | translate}} <span (click)="toggle('Resources')" style="cursor: pointer;">{{isExpanded('Resources')?'-':'+'}}</span>
            </h3>
-           <div *ngFor="let value of status.values">
-                {{value.name | translate}} : {{value.value}} {{value.info?('(' + value.info + ')'):''}}
+           <ng-container *ngIf="isExpanded('Resources')">
+
+
+           <div style="padding-left: 15px;" *ngFor="let value of resources ; trackBy: trackByFn">
+                <span style="font-weight: bold;color: #673ab7;">{{value.name | translate}} :</span> {{value.value}} {{value.info?('(' + value.info + ')'):''}}
            </div>
+        </ng-container>
         </div>
+        <div style="padding-bottom: 16px;" *ngIf="GetSkills(gameState) ; let skills">
+            
+            <h3 style="font-weight: bold;" *ngIf="skills.length > 0" >
+                 {{'categories.Skills' | translate}} <span (click)="toggle('Skills')" style="cursor: pointer;">{{isExpanded('Skills')?'-':'+'}}</span>
+            </h3>
+            <ng-container *ngIf="isExpanded('Skills')">
+
+          
+            <div *ngFor="let skill of  skills ; trackBy: trackByFn">
+                <h4 style="font-weight: bold;padding-top: 10px;padding-left:10px">
+                    {{skill.name | translate}} <span (click)="toggle(skill.name)" style="cursor: pointer;">{{isExpanded(skill.name)?'-':'+'}}</span>
+                </h4>
+                <ng-container *ngIf="isExpanded(skill.name)">
+                <div style="padding-left: 20px;" *ngFor="let value of skill.descriptions; trackBy: trackByFn">
+                    <span style="font-weight: bold;color: #673ab7">{{value.name | translate}} :</span> {{value.value}} {{value.info?('(' + value.info + ')'):''}}
+                </div>
+                </ng-container>
+            </div>
+        </ng-container>
+         </div>
     </mat-card>
 
 

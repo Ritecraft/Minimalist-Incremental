@@ -2,12 +2,18 @@
     "main":
     {
         "language": "Język",
+      
         "languages":
         {
             "en": "Angielski",
             "pl": "Polski"
 
         }
+    },
+    "upgrade": {
+        "level": "Level",
+        "cost": "Cost",
+        "requirements": "Requirements"
     },
     "resources":
     {
@@ -27,7 +33,27 @@
         "Inventing":"Wynalazczość",
         "GettingBored":"Nudzenie się",
         "Adventuring":"Poszukiwanie przygód",
-        "Dreaming":"Śnienie"
+        "Dreaming":"Śnienie",
+        "Athletics":"Athletics",
+        "AnimalHandling":"Animal Handling",
+        "Geology": "Geology",
+        "Medicine": "Medicine",
+        "Suits": "Tech Suits Piloting",
+        "Diplomacy": "Diplomacy",
+        "Music": "Music",
+        "Finance": "Finance",
+        "History": "History",
+        "Engineering": "Engineering",
+        "Biology": "Biology",
+        "Combat": "Combat",
+        "Categories": {
+            "Esoteric": "Esoteric",
+            "NaturalSciences": "Natural Sciences",
+            "Technical": "Technical",
+            "Heroic": "Heroic",
+            "Artistic": "Artistic",
+            "SocialSciences": "Social Sciences"
+        }
     },
     "titles":
     {
@@ -45,6 +71,7 @@
         "adventure": "Idż na przygode!",
         "mine": "Zbuduj kopalnie",
         "quarry": "Wykop kamieniołom",
+        "apply": "Apply",
         "timeTravel": {
 
         
@@ -135,6 +162,8 @@
             "guild": "You found an Adventurer's Guild on the next street over. They have some cool stuff on sale."
         },
         "events": {
+            "sodaLuck": "You got lucky and got a lucky prize-code under a sodda bottlecap",
+            "cat": "You found a cat stuck on a tree. You managed to help it",
             "nothing": "Nothing cool happens.",
             "coin": "You found a coin on the streets. Lucky you! (+1 $)",
             "surveys": "You found an useful comment on the internet - free cash working from home? Sign me in! (+1 passive income)",

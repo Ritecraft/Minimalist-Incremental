@@ -2,12 +2,18 @@
     "main":
     {
         "language": "Language",
+    
         "languages":
         {
             "en": "English",
             "pl": "Polish"
 
         }
+    },
+    "upgrade": {
+        "level": "Level",
+        "cost": "Cost",
+        "requirements": "Requirements"
     },
     "resources":
     {
@@ -28,7 +34,30 @@
         "Inventing":"Inventing",
         "GettingBored":"Getting Bored",
         "Adventuring":"Adventuring",
-        "Dreaming":"Dreaming"
+        "Dreaming":"Dreaming",
+        "Athletics":"Athletics",
+        "AnimalHandling":"Animal Handling",
+        "Geology": "Geology",
+        "Medicine": "Medicine",
+        "Suits": "Tech Suits Piloting",
+        "Diplomacy": "Diplomacy",
+        "Music": "Music",
+        "Finance": "Finance",
+        "History": "History",
+        "Engineering": "Engineering",
+        "Biology": "Biology",
+        "Combat": "Combat",
+
+
+
+        "Categories": {
+            "Esoteric": "Esoteric",
+            "NaturalSciences": "Natural Sciences",
+            "Technical": "Technical",
+            "Heroic": "Heroic",
+            "Artistic": "Artistic",
+            "SocialSciences": "Social Sciences"
+        }
     },
     "titles":
     {
@@ -46,12 +75,13 @@
         "adventure": "Look for an adventure!",
         "mine": "Build a mine",
         "quarry": "Dig a quarry",
+        "apply": "Apply",
+       
         "timeTravel": {
-
+        
         
         "timeMachine": "Build a time machine",
         "powerNode": "Add a power node",
-        
         "timeCrystal": "Construct Crystal Layer",
         "butterfly": "Summon a butterfly",
         "paradoxes": {
@@ -135,6 +165,8 @@
             "guild": "You found an Adventurer's Guild on the next street over. They have some cool stuff on sale."
         },
         "events": {
+            "sodaLuck": "You got lucky and got a lucky prize-code under a sodda bottlecap (You got a bike)",
+            "cat": "You found a cat stuck on a tree. You managed to help it",
             "nothing": "Nothing cool happens.",
             "coin": "You found a coin on the streets. Lucky you! (+1 $)",
             "surveys": "You found an useful comment on the internet - free cash working from home? Sign me in! (+1 passive income)",

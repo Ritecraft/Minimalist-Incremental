@@ -1,13 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { EventsProvider, GameStateModel } from '../models/gamestate.model';
+import { EventsProvider, GameStateModel, SkillsProvider } from '../models/gamestate.model';
 import { GameStateService } from '../services/gamestate.service';
 import {MatDialog} from '@angular/material/dialog';
 import { StoryComponent } from './story/story.component';
 import { MessagesService } from '../services/messages.service';
 import { TranslateService } from '@ngx-translate/core';
-import { StringFormatter } from './format.pipe';
+import { StringFormatter } from './shared/format.pipe';
 import { MessageModel } from '../models/message.model';
+import { analyzeAndValidateNgModules } from '@angular/compiler';
+import { stringify } from '@angular/compiler/src/util';
 @Component({
   selector: 'game-main',
   templateUrl: './main.component.html'
@@ -23,11 +25,37 @@ export class MainComponent implements OnInit {
     this.messages$ = messagesService.messages$;
   }
 
-
+  expandedMap : {[id: string] : boolean} = {};
 
 uptick() {
 
 }  
+
+toggle(id: string)
+{
+  if(!this.expandedMap[id])
+  {
+    this.expandedMap[id] = true;
+  }
+  else
+  {
+    this.expandedMap[id] = false;
+  }
+}
+
+isExpanded(id: string)
+{
+  if(this.expandedMap[id] === false)
+  {
+    return false;
+  }
+  if(this.expandedMap[id] === true)
+  {
+    return true;
+  }
+  this.expandedMap[id] = true;
+  return this.expandedMap[id];
+}
 
 
 ngOnInit() {
@@ -63,13 +91,54 @@ GetResources(g: GameStateModel)
 
 GetSkills(g: GameStateModel)
 {
-  return [{name: 'skills.Inventing', value: g.skills.inventing.toString, info: ''},
-  {name: 'skills.GettingBored', value: g.skills.boredom, info: ''},
-   {name: 'skills.Adventuring', value: g.skills.adventuring, info: (g.adventure.adventuringCooldown < 5?(StringFormatter.TranslateAndFormat(this.translationService, 'infos.adventuring' ,(5 - g.adventure.adventuringCooldown))):'')},
-   {name: 'skills.Drawing', value: g.skills.drawing, info: ''},
-   {name: 'skills.Dreaming', value: g.skills.dreaming, info: ''}
-    
-  ].filter(r => r.value > 0).map(r => {return {name: r.name, value: r.value.toString(), info: r.info }});
+  class InnerDescription
+  {
+    name: string;
+    value: number;
+    info: string;
+    public constructor(name: string, value: number, info: string)
+    {
+      this.name = name;
+      this.value = value;
+      this.info = info;
+    }
+  }
+
+  class DescriptionCollection
+  {
+    name: string;
+    descriptions: InnerDescription[];
+    public constructor(name: string, descriptions: InnerDescription[])
+    {
+      this.name = name;
+      this.descriptions = descriptions;
+    }
+  }
+
+  let res : DescriptionCollection[] = [];
+  var keys = Object.keys(SkillsProvider.Categories);
+  for(let i = 0; i < keys.length; i++)
+  {
+    let res2 : InnerDescription[] = [];
+  for(let j = 0; j < SkillsProvider.SkillCategories[keys[i]].length ; j++)
+  {
+    let key = SkillsProvider.SkillCategories[keys[i]][j];
+    let value = g.skills.skillLevels[key];
+    let info = '';
+    if(key == SkillsProvider.Adventuring)
+    {
+      info = (g.adventure.adventuringCooldown < 5?(StringFormatter.TranslateAndFormat(this.translationService, 'infos.adventuring' ,(5 - g.adventure.adventuringCooldown))):'');
+    }
+    res2.push(new InnerDescription('skills.' + key, value, info));
+  }
+  res2 = res2.filter(r => r.value > 0);
+  if(res2.length > 0)
+  {
+    res.push(new DescriptionCollection('skills.Categories.' + keys[i], res2));
+  }
+}
+
+  return res;
 }
 
 GetStatuses(g : GameStateModel)
@@ -88,6 +157,10 @@ viewStory(g: GameStateModel)
     data: {messages: this.gameStateService.GetStoryMessages(g, this.translationService)}
   });
   
+}
+
+trackByFn(index: number, element: any) {
+  return element.name;
 }
 
 

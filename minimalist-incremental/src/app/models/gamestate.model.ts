@@ -1,3 +1,14 @@
+import { stringify } from "@angular/compiler/src/util";
+import { Upgrade } from "./upgrade.model";
+function copyMap<TVal>(arr : {[key: string] : TVal}) : {[key:string]:TVal} {
+    let result : {[key: string]:TVal} = {};
+    let keys = Object.keys(arr);
+    keys.forEach(element => {
+        result[element] = arr[element];
+    });
+    return result;
+}
+
 export class GameStateModel {
 
 public money: number;
@@ -52,15 +63,37 @@ public eventCashLevel: number;
             {
                 this.timeTravel.foundedDay = this.adventure.days;
             }
+
             this.money -= this.getTimeMachineCost(),
             this.timeTravel.intervalLevel += 1;
+            this.skills.increase(SkillsProvider.Engineering, Math.ceil(this.timeTravel.intervalLevel/4));
             let t = this.timeTravel.intervalLevel % 3 + 1;
             this.timeTravel.entropy += t,
-          
+      
             this.timeTravel.maxEntropy += t,
             this.timeTravel.entropySigils = this.fakeLog(this.timeTravel.maxEntropy)
         }
     }
+
+    BuildTimeTravelUpgrade()
+    {
+        let result = new Upgrade('timeTravel.intervalLevel',this.timeTravel.intervalLevel > 0? 'buttons.timeTravel.powerNode' : 'buttons.timeTravel.timeMachine', g => {(g as GameStateModel).BuyTimeMachine()}, this.timeTravel.intervalLevel)
+        result.AddRequirement('skills.Inventing', 1, this.skills.getValue(SkillsProvider.Inventing));
+        result.AddCost('resources.Money', this.getTimeMachineCost(), this.money);
+        return result;
+    }
+
+    GetPossibleUpgrades() : Upgrade[] {
+        let result : Upgrade[] = [] ;
+        if(this.skills.getValue(SkillsProvider.Inventing) > 0)
+         result.push(this.BuildTimeTravelUpgrade());
+        return result;
+
+        
+
+
+    }
+
     BuyQuarry() {
         this.canBuyQuarry && (this.money -= this.getQuarryCost(), this.quarryLevel += 1)
     }
@@ -108,7 +141,7 @@ public eventCashLevel: number;
 }
 
 abstract class BaseInnerState {
-    public parent: GameStateModel | undefined ;
+    public parent!: GameStateModel; 
 
     setParent(parent : GameStateModel) 
     {
@@ -116,36 +149,108 @@ abstract class BaseInnerState {
     }
 }
 
-class SkillsState extends BaseInnerState {
-    copy(): SkillsState  {
-       return new SkillsState(this.boredom,this.adventuring, this.drawing, this.inventing, this.dreaming);
+export class SkillsProvider {
+    public static GettingBored = 'GettingBored';
+    public static Inventing = 'Inventing';
+    public static Dreaming ='Dreaming';
+    public static Adventuring = 'Adventuring';
+    public static Drawing = 'Drawing';
+    public static Athletics = 'Athletics';
+    public static AnimalHandling = 'AnimalHandling';
+    public static Geology = "Geology";
+    public static Diplomacy = "Diplomacy";
+    public static Combat ='Combat';
+    public static Music = "Music";
+    public static Finance = "Finance";
+    public static History ='History';
+    public static Engineering = "Engineering";
+    public static Medicine = "Medicine";
+    public static Biology ='Biology';
+    public static Suits = 'Suits';
+    public static Luck = 'Luck';
+    public static Categories = {
+        Esoteric: "Esoteric",
+        NaturalSciences: "NaturalSciences",
+        Technical: "Technical",
+        Heroic: "Heroic",
+        Artistic: "Artistic",
+        SocialSciences: "SocialSciences"
     }
-    boredom: number;
-    adventuring: number;
-    drawing: number;
-    inventing: number;
-    dreaming: number;
 
-    constructor(boredom = 0,  adventuring = 0,  drawing = 0, inventing = 0, dreaming = 0) {
-       super();
+    public static Skills : string[] = SkillsProvider.GetAllSkills();
 
-        this.boredom = boredom;
-        this.adventuring = adventuring;
-        this.drawing = drawing;
-        this.inventing = inventing;
-        this.dreaming = dreaming;
+    public static GetAllSkills() : string[] 
+    {
+        function getProperty<T, K extends keyof T>(o: T, propertyName: K): T[K] {
+            return o[propertyName]; // o[propertyName] is of type T[K]
+        }
+
+        let keys = Object.getOwnPropertyNames(SkillsProvider) as Array<keyof SkillsProvider>;;
+        let obj = {...SkillsProvider};
+        let result = keys.filter(
+
+            r=> (getProperty(obj, r) + '') === (getProperty(obj,r))
+        ).map(r => getProperty(obj, r));
+    
+        console.log(result);
+        return result;
+    }
+
+    public static SkillCategories : {[id: string] : string[]} = SkillsProvider.GetSkillCategories();
+
+
+    public static GetSkillCategories() {
+       let result : {[id: string] : string[]} = {};
+       result[SkillsProvider.Categories.Heroic] = [SkillsProvider.Adventuring, SkillsProvider.Athletics, SkillsProvider.Combat];
+       result[SkillsProvider.Categories.Esoteric] = [SkillsProvider.GettingBored, SkillsProvider.Dreaming, SkillsProvider.Luck];
+       result[SkillsProvider.Categories.Technical] = [SkillsProvider.Inventing, SkillsProvider.Engineering, SkillsProvider.Suits];
+       result[SkillsProvider.Categories.Artistic] = [SkillsProvider.Drawing, SkillsProvider.Music];
+       result[SkillsProvider.Categories.NaturalSciences] = [SkillsProvider.AnimalHandling, SkillsProvider.Geology, SkillsProvider.Biology, SkillsProvider.Medicine];
+       result[SkillsProvider.Categories.SocialSciences] = [SkillsProvider.History, SkillsProvider.Finance, SkillsProvider.Diplomacy]
+       return result;
+    }
+}
+
+class SkillsState extends BaseInnerState {
+    public skills : string[];
+    public skillLevels: {[name: string] : number};   
+    copy(): SkillsState  {
+       return new SkillsState(copyMap(this.skillLevels));
+    }
+
+    getValue(id: string)
+    {
+    
+        return this.skillLevels[id];
+    }
+
+    increase(id: string, delta: number)
+    {
+        this.skillLevels[id]+=delta;
+    }
+
+    constructor(skillLevels: {[name:string]:number} = {}) {
+        super();
+       this.skills = SkillsProvider.Skills;
+
+        this.skills.forEach(element => {
+            if(!skillLevels[element]) skillLevels[element] = 0;
+        });
+        this.skillLevels = skillLevels;
     }
 }
 
 class AdventureGuildState {
     canAccess : boolean;
-    constructor(canAccess = false)
+    gotBike : boolean;
+    constructor(canAccess = false, gotBike = false)
     {
         this.canAccess = canAccess;
+        this.gotBike = gotBike;
     }
 
     copy() : AdventureGuildState {
-        return new AdventureGuildState(this.canAccess);
+        return new AdventureGuildState(this.canAccess, this.gotBike);
     }
 }
 
@@ -168,14 +273,16 @@ class AdventureState extends BaseInnerState {
         this.guild = guild;
         this.eventCooldownReducer = eventCooldownReducer;
         this.eventCooldownReducerTime = eventCooldownReducerTime;
-        this.adventuringCooldown = 5;
+        this.adventuringCooldown = 7;
        
     }
 
     setParent(parent : GameStateModel)
     {
         super.setParent(parent);
-        this.adventuringCooldown = Math.ceil(Math.pow(0.99, parent.skills.adventuring)*5)
+        this.adventuringCooldown = Math.ceil(Math.pow(0.99, parent.skills.getValue(SkillsProvider.Adventuring))*7)
+        if(this.guild.gotBike) this.adventuringCooldown-= 1;
+        if(this.adventuringCooldown < 1) this.adventuringCooldown = 1;
     }
 
     setReducer(value : number, time:number)
@@ -210,6 +317,7 @@ class AdventureState extends BaseInnerState {
         return Math.floor(Math.random() * (max - min + 1) + min)
     }
     getRandomEvent(gameState: GameStateModel) {
+      
         if (this.coolDown > 0)
             return "";
         let e = EventsProvider.GetAllEvents();
@@ -217,7 +325,14 @@ class AdventureState extends BaseInnerState {
             return "";
         let n = 0;
         for (let o = 0; o < e.length; o++)
-            n += e[o].weight;
+        {
+            if(e[o].id == 2 ) 
+            {
+                console.log('boring chance ' + e[o].weight(gameState) )
+            }
+            n += e[o].weight(gameState);
+        }
+        console.log('all chance ' + n);
         let r = n - Math.floor(n),
         s = 1;
         r > 0 && (s = 1 / r),
@@ -225,12 +340,12 @@ class AdventureState extends BaseInnerState {
         let i = this.randomIntFromInterval(0, n - 1);
         i.toString();
         for (let o = 0; o < e.length; o++) {
-            if (i < e[o].weight * s)
+            if (i < e[o].weight(gameState) * s)
             {
-                if(this.parent) this.parent.skills.adventuring += 1;
+                if(this.parent) this.parent.skills.increase(SkillsProvider.Adventuring,1);
                 return e[o].apply(gameState), this.knownEvents[e[o].id] += 1, e[o].message;
             }
-            i -= e[o].weight * s
+            i -= e[o].weight(gameState) * s
         }
         return ""
     }
@@ -247,10 +362,10 @@ class EventModel {
     id: number;
     message: string;
     maxCount: number;
-    weight: number;
+    weight: any;
     isValid: any;
     apply: any;
-    constructor(id : number, maxCount : number, weight : number, isValid : (g :GameStateModel) => boolean, apply : (g: GameStateModel) => void, message : string) {
+    constructor(id : number, maxCount : number, weight : (g :GameStateModel) => number, isValid : (g :GameStateModel) => boolean, apply : (g: GameStateModel) => void, message : string) {
         this.id = id,
         this.message = message,
         this.maxCount = maxCount,
@@ -264,25 +379,54 @@ export class EventsProvider {
     static Init() {
         this.events = [],
         this.events.push(
-            new EventModel(9, 1, 1000, t=> true, t => (t.skills.inventing+=1, t),"story.inventor.head"),
-            new EventModel(12, 1, 100, g => g.skills.adventuring > 100, g => (g.adventure.guild.canAccess = true,g), "story.adventurer.guild"),
-            new EventModel(0, 1, 2, t => !0, t => (t.eventCashLevel += 1, t), "story.events.surveys"), 
-            new EventModel(8, 6, 1.2, g => true, t => (t.adventure.setReducer(1,2),t.bottlecaps+=1, t), "story.events.soda" ),
-            new EventModel(10, 5, 8, g=> g.timeTravel.getSigilCount() >= 3, g => (g.skills.dreaming+=1, g), "story.events.unknownDreams"),
-            new EventModel(11, 5, 4, g=> g.timeTravel.getSigilCount() >= 4 && g.skills.dreaming>=5, g => (g.skills.dreaming+=2,g.skills.adventuring+=1, g), "story.events.travelDreams"),
-            new EventModel(1, 20, 6, t => !0, t => (t.money += 1, t), "story.events.coin"), 
-            new EventModel(2, 1e8, 1.8, t => !0, t => (t.skills.boredom+=1,t), "story.events.nothing"),
-            new EventModel(3, 1, .1, t => t.money >= 20, t => (t.eventCashLevel += 1, t.money -= 20, t), "story.events.discord"), 
-            new EventModel(4, 20, .4, t => t.skills.boredom >= 5, t => (t.skills.boredom += 2, t.money += 10, t), "story.events.shift"), 
-            new EventModel(5, 1, .1, t => t.skills.boredom >= 10 && t.eventCashLevel > 1, t => (t.eventCashLevel += 1, t), "story.events.cultStart"), 
-            new EventModel(6, 1, 1.1, t => t.skills.boredom >= 20 && t.timeTravel.maxEntropy > 1, t => (t.timeTravel.eventSigils += 1,t.skills.drawing+=1, t), "story.events.doodleSigil"),
-            new EventModel(7, 1, 2, t => t.adventure.days - t.timeTravel.foundedDay >= 365 && t.timeTravel.maxEntropy > 1 && t.money > 20, t => (t.timeTravel.eventSigils += 1, t.money -= 20, t), "story.events.paintSigil"));
+            new EventModel(9, 1, g => 1000, t=> true, t => (t.skills.increase(SkillsProvider.Inventing,1), t),"story.inventor.head"),
+            new EventModel(14, 1 ,g =>  g.adventure.knownEvents[8]/6, g => true, g => (g.skills.increase(SkillsProvider.Luck,5),g.adventure.setReducer(1,2),g.adventure.guild.gotBike, g), 'story.events.sodaLuck'  ),
+            new EventModel(13, 1, g => 1, g => g.skills.getValue(SkillsProvider.Adventuring) > 10, g => (g.skills.increase(SkillsProvider.AnimalHandling, 1),g.skills.increase(SkillsProvider.Athletics, 1),g), "story.adventurer.cat"),
+            new EventModel(12, 1, g => 100, g => g.skills.getValue(SkillsProvider.Adventuring) > 100, g => (g.adventure.guild.canAccess = true,g), "story.adventurer.guild"),
+            new EventModel(0, 1,g =>  2, t => !0, t => (t.eventCashLevel += 1, t), "story.events.surveys"), 
+            new EventModel(8, 6, g => 1.2, g => true, t => (t.adventure.setReducer(1,2),t.bottlecaps+=1, t), "story.events.soda" ),
+            new EventModel(10, 5,g =>  8, g=> g.timeTravel.getSigilCount() >= 3, g => (g.skills.increase(SkillsProvider.Dreaming,1), g), "story.events.unknownDreams"),
+            new EventModel(11, 5,g =>  4, g=> g.timeTravel.getSigilCount() >= 4 && g.skills.getValue(SkillsProvider.Dreaming)>=5, g => (g.skills.increase(SkillsProvider.Dreaming,2),g.skills.increase(SkillsProvider.Adventuring,1), g), "story.events.travelDreams"),
+            new EventModel(1, 20,g =>  1, t => !0, t => (t.money += 1,t.skills.increase(SkillsProvider.Luck,5), t), "story.events.coin"), 
+            new EventModel(2, 1e8,g =>  (Math.round(1800 * Math.pow(0.995, (4 * g.skills.getValue(SkillsProvider.Luck) + g.skills.getValue(SkillsProvider.Adventuring) /13)))/1000), t => !0, t => (t.skills.increase(SkillsProvider.GettingBored,1),t), "story.events.nothing"),
+            new EventModel(3, 1, g => .1, t => t.money >= 20, t => (t.eventCashLevel += 1, t.money -= 20, t), "story.events.discord"), 
+            new EventModel(4, 20,g =>  .4, t => t.skills.getValue(SkillsProvider.GettingBored) >= 5, t => (t.skills.increase(SkillsProvider.GettingBored,1), t.money += 10, t), "story.events.shift"), 
+            new EventModel(5, 1, g => .1, t => t.skills.getValue(SkillsProvider.GettingBored) >= 10 && t.eventCashLevel > 1, t => (t.eventCashLevel += 1, t.skills.increase(SkillsProvider.Diplomacy, 1), t), "story.events.cultStart"), 
+            new EventModel(6, 1, g => 1.1, t => t.skills.getValue(SkillsProvider.GettingBored) >= 20 && t.timeTravel.maxEntropy > 1, t => (t.timeTravel.eventSigils += 1,t.skills.increase(SkillsProvider.Drawing,1), t), "story.events.doodleSigil"),
+            new EventModel(7, 1, g => 2, t => t.adventure.days - t.timeTravel.foundedDay >= 365 && t.timeTravel.maxEntropy > 1 && t.money > 20, t => (t.timeTravel.eventSigils += 1, t.money -= 20, t), "story.events.paintSigil"));
 
     }
     static GetAllEvents() {
         return this.events
     }
 }
+
+class SkillValue {
+    name: string;
+    value: number;
+    /**
+     *
+     */
+    constructor(name: string, value:number) {
+        this.name = name;
+        this.value = value;
+        
+    }
+}
+
+class ParadoxDescription
+{
+    name: string;
+    requirements: SkillValue[];
+    gains: SkillValue[];
+    constructor(name: string, requirements: SkillValue[], gains: SkillValue[])
+    {
+        this.name = name;
+        this.requirements = requirements;
+        this.gains = gains;
+    }
+}
+
 class TimeTravelState extends BaseInnerState {
     static primeCosts = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 1000000001];
     cachedDilation: number;
@@ -331,13 +475,23 @@ class TimeTravelState extends BaseInnerState {
         return new TimeTravelState(this.intervalLevel, this.butterflyResonatorLevel, this.paradoxEngineLevel, this.timeCrystalLevel, this.entropy, this.entropySigils, this.maxEntropy, this.eventSigils, this.foundedDay)
     }
     BuyTimeCrystal() {
-        this.canBuyCrystal && (this.entropy -= TimeTravelState.primeCosts[this.timeCrystalLevel], this.timeCrystalLevel += 1)
+        this.canBuyCrystal && (this.entropy -= TimeTravelState.primeCosts[this.timeCrystalLevel],this.parent.skills.increase(SkillsProvider.Geology, this.timeCrystalLevel+1) ,this.timeCrystalLevel += 1);
     }
+
+    levelSkillsFromParadox()
+    {
+        for(let i = 0; i < TimeTravelState.paradoxes[this.paradoxEngineLevel].gains.length; i++)
+        {
+            let skill = TimeTravelState.paradoxes[this.paradoxEngineLevel].gains[i];
+            this.parent.skills.increase(skill.name, skill.value);
+        }
+    }
+
     BuyParadox() {
-        this.canBuyParadox && (this.entropy -= TimeTravelState.primeCosts[this.paradoxEngineLevel], this.paradoxEngineLevel += 1)
+        this.canBuyParadox && (this.entropy -= TimeTravelState.primeCosts[this.paradoxEngineLevel],this.levelSkillsFromParadox(),  this.paradoxEngineLevel += 1)
     }
     BuyButterfly() {
-        this.canBuyButterfly && (this.entropy -= TimeTravelState.primeCosts[this.butterflyResonatorLevel], this.butterflyResonatorLevel += 1)
+        this.canBuyButterfly && (this.entropy -= TimeTravelState.primeCosts[this.butterflyResonatorLevel], this.butterflyResonatorLevel += 1,this.parent?.skills.increase(SkillsProvider.AnimalHandling, this.butterflyResonatorLevel))
     }
     GetTimeDilation() {
         if (this.cachedDilation > 0)
@@ -364,5 +518,70 @@ class TimeTravelState extends BaseInnerState {
     getSigilCount()
     {
         return this.eventSigils + this.entropySigils;
+    }
+
+  
+
+    static paradoxes = [
+        new ParadoxDescription("buttons.timeTravel.paradoxes.washington", [new SkillValue(SkillsProvider.Diplomacy, 0)], [new SkillValue(SkillsProvider.Diplomacy, 1)]),
+        new ParadoxDescription("buttons.timeTravel.paradoxes.ancestor", [new SkillValue(SkillsProvider.Combat, 10)], [new SkillValue(SkillsProvider.Combat, 2)]),
+        new ParadoxDescription("buttons.timeTravel.paradoxes.beethoven", [new SkillValue(SkillsProvider.Music, 20)], [new SkillValue(SkillsProvider.Music, 3)]),
+        new ParadoxDescription("buttons.timeTravel.paradoxes.pastTravel", [new SkillValue(SkillsProvider.Engineering, 15), new SkillValue(SkillsProvider.History, 15)], [new SkillValue(SkillsProvider.Engineering, 2), new SkillValue(SkillsProvider.History, 2)]),
+        new ParadoxDescription("buttons.timeTravel.paradoxes.noPlague", [new SkillValue(SkillsProvider.Biology, 20), new SkillValue(SkillsProvider.Medicine, 20)], [new SkillValue(SkillsProvider.Medicine, 3), new SkillValue(SkillsProvider.Biology, 2)]),
+        new ParadoxDescription("buttons.timeTravel.paradoxes.yesPlague", [new SkillValue(SkillsProvider.Biology, 25), new SkillValue(SkillsProvider.Medicine, 25)], [new SkillValue(SkillsProvider.Medicine, 2), new SkillValue(SkillsProvider.Biology, 4)]),
+        new ParadoxDescription("buttons.timeTravel.paradoxes.saveDodos", [new SkillValue(SkillsProvider.Biology, 30), new SkillValue(SkillsProvider.Combat, 30)], [new SkillValue(SkillsProvider.Combat, 3), new SkillValue(SkillsProvider.Biology, 4)]),
+        new ParadoxDescription("buttons.timeTravel.paradoxes.killMoskitos", [new SkillValue(SkillsProvider.Biology, 35), new SkillValue(SkillsProvider.Combat, 35)], [new SkillValue(SkillsProvider.Combat, 5), new SkillValue(SkillsProvider.Biology,3)]),
+        new ParadoxDescription("buttons.timeTravel.paradoxes.greekGenes", [new SkillValue(SkillsProvider.Biology, 50), new SkillValue(SkillsProvider.History, 30)], [new SkillValue(SkillsProvider.Biology, 6), new SkillValue(SkillsProvider.History, 3)]),
+        new ParadoxDescription("buttons.timeTravel.paradoxes.stopSwans", [new SkillValue(SkillsProvider.Diplomacy, 45), new SkillValue(SkillsProvider.Combat, 45)], [new SkillValue(SkillsProvider.Diplomacy, 5), new SkillValue(SkillsProvider.Combat, 5)]),
+        new ParadoxDescription("buttons.timeTravel.paradoxes.moonLanding", [new SkillValue(SkillsProvider.Engineering, 30), new SkillValue(SkillsProvider.Athletics, 35), new SkillValue(SkillsProvider.Suits, 35)], [new SkillValue(SkillsProvider.Engineering, 1), new SkillValue(SkillsProvider.Athletics,4), new SkillValue(SkillsProvider.Suits, 4)]),
+        new ParadoxDescription("buttons.timeTravel.paradoxes.apple", [new SkillValue(SkillsProvider.History, 30), new SkillValue(SkillsProvider.Finance, 80)], [new SkillValue(SkillsProvider.History, 3), new SkillValue(SkillsProvider.Finance, 9)]),
+        new ParadoxDescription("buttons.timeTravel.paradoxes.mafia", [new SkillValue(SkillsProvider.Finance, 60), new SkillValue(SkillsProvider.Diplomacy, 60)], [new SkillValue(SkillsProvider.Diplomacy, 13)]),
+        new ParadoxDescription("buttons.timeTravel.paradoxes.backToTheFuture", [new SkillValue(SkillsProvider.Diplomacy, 80), new SkillValue(SkillsProvider.Music, 50)], [new SkillValue(SkillsProvider.Music, 14)]),
+        new ParadoxDescription("buttons.timeTravel.paradoxes.futureTravel", [new SkillValue(SkillsProvider.Engineering, 140)], [new SkillValue(SkillsProvider.Engineering, 15)]),
+        new ParadoxDescription("buttons.timeTravel.paradoxes.honestAbe", [new SkillValue(SkillsProvider.Diplomacy, 85), new SkillValue(SkillsProvider.History, 65)], [new SkillValue(SkillsProvider.History, 8), new SkillValue(SkillsProvider.Diplomacy,8)]),
+        new ParadoxDescription("buttons.timeTravel.paradoxes.stop", [new SkillValue(SkillsProvider.History, 2000), new SkillValue(SkillsProvider.Combat, 2000)], [new SkillValue(SkillsProvider.Combat, 1)]),
+
+      ];
+
+      BuildCrystalUpgrade()
+    {
+        let result = new Upgrade('timeTravel.crystals', 'buttons.timeTravel.timeCrystal', g => {(g as GameStateModel).timeTravel.BuyTimeCrystal()}, this.timeCrystalLevel)
+        result.AddRequirement('skills.' + SkillsProvider.AnimalHandling, (this.timeCrystalLevel)*10, this.parent.skills.getValue(SkillsProvider.Geology) );
+        result.AddCost('resources.Entropy',  TimeTravelState.primeCosts[this.timeCrystalLevel],  this.entropy);
+        return result;
+    }
+
+    BuildButterflyUpgrade()
+    {
+        let result = new Upgrade('timeTravel.butterfly', 'buttons.timeTravel.butterfly', g => {(g as GameStateModel).timeTravel.BuyButterfly()}, this.butterflyResonatorLevel)
+        result.AddCost('resources.Entropy',  TimeTravelState.primeCosts[this.butterflyResonatorLevel],  this.entropy);
+        result.AddRequirement('skills.' + SkillsProvider.AnimalHandling, (this.butterflyResonatorLevel)*10, this.parent.skills.getValue(SkillsProvider.AnimalHandling) );
+        return result;
+    }
+
+    BuildParadoxUpgrade()
+    {
+        let result = new Upgrade('timeTravel.paradox', TimeTravelState.paradoxes[this.paradoxEngineLevel].name , g => {(g as GameStateModel).timeTravel.BuyParadox()}, this.paradoxEngineLevel)
+        result.AddCost('resources.Entropy',  TimeTravelState.primeCosts[this.paradoxEngineLevel],  this.entropy);
+        for(let i = 0; i < TimeTravelState.paradoxes[this.paradoxEngineLevel].requirements.length; i++)
+        {
+            let skill = TimeTravelState.paradoxes[this.paradoxEngineLevel].requirements[i];
+            result.AddRequirement('skills.' + skill.name, skill.value, this.parent.skills.getValue(skill.name) );
+        }
+        return result;
+    }
+
+
+    GetPossibleUpgrades() : Upgrade[] {
+        let result : Upgrade[] = [] ;
+        if(this.intervalLevel > 1)
+        {
+         result.push(this.BuildCrystalUpgrade());
+         result.push(this.BuildButterflyUpgrade());
+         result.push(this.BuildParadoxUpgrade());
+        }
+        return result;
+
+        
     }
 }

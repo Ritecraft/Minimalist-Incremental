@@ -15,12 +15,14 @@ import {MatTabsModule} from '@angular/material/tabs'
 import { MessagesService } from './services/messages.service';
 import {MatSelectModule} from '@angular/material/select';
 import { MainComponent } from './components/main.component';
-import { StringFormatPipe } from './components/format.pipe';
+import { StringFormatPipe } from './components/shared/format.pipe';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatMenuModule} from '@angular/material/menu';
 import { KnownLocationsComponent } from './components/known-locations/known-locations.component';
 import { GarageComponent } from './components/known-locations/garage/garage.component';
 import { TimeTravelLabComponent } from './components/known-locations/time-travel-lab/time-travel-lab.component';
+import { UpgradeComponent } from './components/shared/upgrade/upgrade.component';
+import { UpgradesComponent } from './components/shared/upgrade/upgrades.component';
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
 }
@@ -32,7 +34,9 @@ export function HttpLoaderFactory(http: HttpClient) {
     StringFormatPipe,
     KnownLocationsComponent,
     GarageComponent,
-    TimeTravelLabComponent
+    TimeTravelLabComponent,
+    UpgradeComponent,
+    UpgradesComponent
   ],
   imports: [
     BrowserModule,

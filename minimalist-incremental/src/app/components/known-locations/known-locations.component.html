@@ -3,12 +3,12 @@
   
         <ng-template matTabContent>
             <div style="padding-top: 8px">
-            <ng-container  *ngIf="gameState.skills.inventing > 0">
+            <ng-container  *ngIf="gameState.skills.getValue('Inventing') > 0">
             <garage [gameState]="gameState">
 
             </garage>
         </ng-container>
-        <ng-container *ngIf="!gameState.skills.inventing">
+        <ng-container *ngIf="!gameState.skills.getValue('Inventing')">
             {{'locations.emptyGarage' | translate}}
         </ng-container>
     </div>    

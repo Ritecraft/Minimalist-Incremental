@@ -1,44 +1,4 @@
 
-<table>
-    <thead>
-        <tr>
-           
-            <th>
-               {{gameState.timeTravel.intervalLevel?('timeTravel.intervalLevel' | translate):''}}
-            </th>
-            <th>
-                {{gameState.mineLevel?('mining.mineLevel' | translate):''}}
-            </th>
-            <th>
-                {{gameState.quarryLevel?('quarry.quarryLevel' | translate):''}}
-            </th>
-        </tr>
-    
-    </thead>
-    <tbody>
-        <tr>
-          
-            <td *ngIf="gameState.timeTravel.intervalLevel > 0">
-                {{gameState.timeTravel.intervalLevel}} 
-            </td>
-            <td  *ngIf="gameState.mineLevel > 0">
-                {{gameState.mineLevel}} 
-            </td>
-            <td *ngIf="gameState.quarryLevel > 0">
-                {{gameState.quarryLevel}} 
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <button mat-raised-button color="primary" (click)="buyTimeMachine()" [disabled]="!gameState.timeTravel.canBuyTimeMachine">{{(gameState.timeTravel.intervalLevel > 0?'buttons.timeTravel.powerNode':'buttons.timeTravel.timeMachine') | translate}}</button>
-            </td>
-            <td *ngIf="gameState.skills.inventing > 5">
-                <button mat-raised-button color="primary" (click)="buyMine()" [disabled]="!gameState.canBuyMine">{{'buttons.mine' | translate}}</button>
-            </td>
-            <td *ngIf="gameState.skills.inventing > 10">  
-                <button mat-raised-button color="primary" (click)="buyQuarry()" [disabled]="!gameState.canBuyQuarry">{{'buttons.quarry' | translate}}</button>
-            </td>
-        </tr>
-    </tbody>
-    </table>
-  
+<upgrades [upgrades]="gameState.GetPossibleUpgrades()">
+
+</upgrades>

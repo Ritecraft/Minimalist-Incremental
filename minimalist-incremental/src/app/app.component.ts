@@ -23,7 +23,6 @@ uptick() {
 
 setLanguage(lang: string)
 {
-  debugger;
   this.translateService.use(lang);
 }
 

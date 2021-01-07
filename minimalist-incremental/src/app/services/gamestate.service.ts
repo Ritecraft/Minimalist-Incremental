@@ -1,7 +1,8 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
-import { StringFormatter } from "../components/format.pipe";
-import { GameStateModel } from "../models/gamestate.model";
+import { StringFormatter } from "../components/shared/format.pipe";
+import { GameStateModel, SkillsProvider } from "../models/gamestate.model";
+import { Upgrade } from "../models/upgrade.model";
 import { MessagesService } from "./messages.service";
 
 @Injectable()
@@ -78,15 +79,31 @@ export class GameStateService {
         e
     }
 
+    applyUpgrade(u: Upgrade)
+    {
+        let g = this.gameState_subject.value.copy();
+        u.Apply(g);
+        if(u.id == 'timeTravel.intervalLevel_0')
+        {
+            this.messagesService.publish('story.inventor.first',g.timeTravel.foundedDay);
+            this.messagesService.publish("story.inventor.firstSigil");
+        }
+        if(u.id == 'timeTravel.intervalLevel_1')
+        {
+            this.messagesService.publish('story.inventor.timeTravelLab');
+        }
+        this.next(g);
+    }
+
     GetStoryMessages(g : GameStateModel, t: any) {
         let result : {texts: string[], category:string}[] = [];
         result.push({texts: [], category: t.instant('story.inventor.path')});
         result.push({texts: [], category: t.instant('story.social.path')});
-        if(g.skills.inventing > 0) result[0].texts.push(t.instant('story.inventor.head'));
+        if(g.skills.getValue(SkillsProvider.Inventing) > 0) result[0].texts.push(t.instant('story.inventor.head'));
         if(g.timeTravel.intervalLevel > 0) result[0].texts.push(StringFormatter.TranslateAndFormat(t, 'story.inventor.first', g.timeTravel.foundedDay));
         if(g.timeTravel.intervalLevel > 0) result[0].texts.push(t.instant("story.inventor.firstSigil"));
         if(g.timeTravel.intervalLevel > 1) result[0].texts.push(t.instant("story.inventor.timeTravelLab"));
-        if(g.skills.dreaming > 0) result[0].texts.push(t.instant("story.inventor.dreams"));
+        if(g.skills.getValue(SkillsProvider.Dreaming) > 0) result[0].texts.push(t.instant("story.inventor.dreams"));
  
 
         if(g.eventCashLevel > 0) result[1].texts.push(t.instant("story.social.surveys"))
